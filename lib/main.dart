@@ -6,10 +6,7 @@ import 'dart:async';
 
 import 'package:intl/intl.dart';
 
-// TODO: Resume at https://www.youtube.com/watch?v=ErP_xomHKTw&list=WL&index=3&t=172s
-
 Future<void> main() async {
-  // TODO: resume tutorial https://www.youtube.com/watch?v=ErP_xomHKTw&list=WL&index=2&t=172s
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
@@ -18,7 +15,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -70,6 +66,12 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
+
+  Stream<List<User>> readUsers() =>
+      FirebaseFirestore.instance.collection('users').snapshots().map(
+            (snapshot) =>
+                snapshot.docs.map((doc) => User.fromJson(doc.data())).toList(),
+          );
 
   Future createUser({required String name}) async {
     // Reference to document
@@ -182,4 +184,11 @@ class User {
         'age': age,
         'birthday': birthday,
       };
+
+  static User fromJson(Map<String, dynamic> json) => User(
+        id: json['id'],
+        name: json['name'],
+        age: json['age'],
+        birthday: (json['birthday'] as Timestamp).toDate(),
+      );
 }
