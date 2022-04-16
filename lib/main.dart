@@ -60,12 +60,19 @@ class _MainPageState extends State<MainPage> {
 
   Future createUser({required String name}) async {
     // Reference to document
-    final docUser = FirebaseFirestore.instance.collection('users').doc('my-id');
-    final json = {
-      'name': name,
-      'age': 21,
-      'birthday': DateTime(2001, 7, 28),
-    };
+    final docUser = FirebaseFirestore.instance.collection('users').doc();
+    // final json = {
+    //   'name': name,
+    //   'age': 21,
+    //   'birthday': DateTime(2001, 7, 28),
+    // };
+    final user = User(
+      id: docUser.id,
+      name: 'David',
+      age: 21,
+      birthday: DateTime(1969, 12, 17),
+    );
+    final json = user.toJson();
     // Create document and write data to Firebase
     await docUser.set(json);
   }
@@ -78,9 +85,16 @@ class User {
   final DateTime birthday;
 
   User({
-    this.id = '',
+    required this.id,
     required this.name,
     required this.age,
     required this.birthday,
   });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'age': age,
+        'birthday': birthday,
+      };
 }
