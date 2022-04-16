@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'dart:async';
 
-Future main() async {
+Future<void> main() async {
+  // TODO: resume tutorial https://www.youtube.com/watch?v=ErP_xomHKTw&list=WL&index=2&t=172s
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,39 +35,52 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  final controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        title: TextField(
+          controller: controller,
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              final name = controller.text;
+              createUser(name: name);
+            },
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: const Center(child: Text('')),
     );
   }
+
+  Future createUser({required String name}) async {
+    // Reference to document
+    final docUser = FirebaseFirestore.instance.collection('users').doc('my-id');
+    final json = {
+      'name': name,
+      'age': 21,
+      'birthday': DateTime(2001, 7, 28),
+    };
+    // Create document and write data to Firebase
+    await docUser.set(json);
+  }
 }
+
+// class User {
+//   String id;
+//   final String name;
+//   final int age;
+//   final DateTime birthday;
+
+//   User({
+//     this.id = '',
+//     required this.name,
+//     required this.age,
+//     required this.birthday,
+//   });
+// }
