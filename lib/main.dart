@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:async';
+
+import 'package:intl/intl.dart';
 
 Future<void> main() async {
   // TODO: resume tutorial https://www.youtube.com/watch?v=ErP_xomHKTw&list=WL&index=2&t=172s
@@ -54,7 +57,15 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
-      body: const Center(child: Text('')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const UserPage()));
+          },
+          child: const Text('User Page'),
+        ),
+      ),
     );
   }
 
@@ -78,6 +89,78 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+class UserPage extends StatefulWidget {
+  const UserPage({Key? key}) : super(key: key);
+
+  @override
+  State<UserPage> createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  final controllerName = TextEditingController();
+  final controllerAge = TextEditingController();
+  final controllerDate = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add User'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          TextField(
+            controller: controllerName,
+            decoration: const InputDecoration(hintText: 'Name'),
+          ),
+          const SizedBox(height: 24),
+          TextField(
+            controller: controllerAge,
+            decoration: const InputDecoration(hintText: 'Age'),
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 24),
+          DateTimeField(
+            controller: controllerDate,
+            decoration: const InputDecoration(hintText: 'Birthdate'),
+            format: DateFormat('yyyy-MM-dd'),
+            onShowPicker: (context, currentValue) {
+              return showDatePicker(
+                context: context,
+                initialDate: currentValue ?? DateTime.now(),
+                firstDate: DateTime(1900),
+                lastDate: DateTime(2100),
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              final user = User(
+                name: controllerName.text,
+                age: int.parse(controllerAge.text),
+                birthday: DateTime.parse(controllerDate.text),
+              );
+              createUser(user);
+              Navigator.pop(context);
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future createUser(User user) async {
+    // Reference to document
+    final docUser = FirebaseFirestore.instance.collection('users').doc();
+    user.id = docUser.id;
+    final json = user.toJson();
+    // Create document and write data to Firebase
+    await docUser.set(json);
+  }
+}
+
 class User {
   String id;
   final String name;
@@ -85,7 +168,7 @@ class User {
   final DateTime birthday;
 
   User({
-    required this.id,
+    this.id = '',
     required this.name,
     required this.age,
     required this.birthday,
