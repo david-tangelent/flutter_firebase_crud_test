@@ -6,6 +6,8 @@ import 'dart:async';
 
 import 'package:intl/intl.dart';
 
+// TODO: Resume at https://www.youtube.com/watch?v=ErP_xomHKTw&list=WL&index=3&t=172s
+
 Future<void> main() async {
   // TODO: resume tutorial https://www.youtube.com/watch?v=ErP_xomHKTw&list=WL&index=2&t=172s
   WidgetsFlutterBinding.ensureInitialized();
